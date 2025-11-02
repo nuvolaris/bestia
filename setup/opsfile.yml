@@ -79,23 +79,40 @@ tasks:
   prereq:
     silent: true
     cmds:
-    - exit 0
+    - exit 0 g
 
   mini:
+    desc: mini
+    vars:
+      BASEURL: '{{or ._baseurl_ "http://miniops.me"}}'
+      #PROTO: '{{ (split .BASEURL "://" | first) }}'
+      #DOMAIN: '{{ split ":" ( split "/" ( split "://" .BASEURL | last ) | first ) | first }}'
+  cmds:
+    - echo x {{.BASEURL}}
+    - echo x {{.PROTO}}
+    - echo x {{.DOMAIN}}
+
+  mini1:
     silent: true
     desc: install miniops
+    vars:
+      BASEURL: '{{or ._baseurl_ "http://miniops.me"}}'
+      PROTO: '{{ (split .BASEURL "://" | first) }}'
+      DOMAIN: '{{ (split (split .BASEURL "://" | last) "/" | first) }}'
+
     cmds:
+      - echo "{{.BASEURL}}" | rg '^https?://' || die "domain should include http(s):// prefix"
       - docker -v || die "Docker is not installed. Please install Docker Desktop first."
       - docker info 2>/dev/null >/dev/null || die "Docker is not running. Please start Docker Desktop first."
       - |
         if test -z {{.__skip_check_cluster}}
         then          
-          if curl -sL http://miniops.me >/dev/null 2>/dev/null
+          if curl -sL http://{{.BASEURL}} >/dev/null 2>/dev/null
           then
-            if curl -sL http://miniops.me/api/info 2>/dev/null | jq  -r .description 2>/dev/null | rg OpenWhisk >/dev/null 2>/dev/null
+            if curl -sL {{.BASEURL}}/api/info 2>/dev/null | jq  -r .description 2>/dev/null | rg OpenWhisk >/dev/null 2>/dev/null
             then
               echo "*** Apache OpenServerless mini is already installed."
-              echo "*** Login with: ops ide login devel http://miniops.me"
+              echo "*** Login with: ops ide login devel {{.BASEURL}}"
               echo "*** You can find the password in .ops/devel.password in your home directory"
               echo "*** You can can uninstall and restart with: ops setup docker delete"
               exit 1
