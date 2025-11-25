@@ -28,4 +28,4 @@ tasks:
   update:
     desc: Deploys updates for Openserverless components
 
- 
+

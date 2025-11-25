@@ -29,7 +29,7 @@ Usage:
     ide deploy [<action>|--packages|--web] [--dry-run]
     ide undeploy [<action>] [--dry-run]
     ide clean
-    ide setup 
+    ide setup
     ide serve
     ide poll
     ide shell
@@ -37,6 +37,7 @@ Usage:
     ide python
     ide nodejs
     ide devcontainer
+    ide logout
 ```
 
 ## Commands
@@ -60,7 +61,7 @@ Usage:
 ## Options
 
 ```
---dry-run       Simulates the execution without making any actual changes 
+--dry-run       Simulates the execution without making any actual changes
 --packages      Only deploy packages, skip web upload
 --web           Only deploy web folder, skip packages
 --fast          Skip the initial deployment step and go in incremental update mode

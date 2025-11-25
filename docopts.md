@@ -20,6 +20,12 @@ under the License.
 
 Type `ops <task>` to see usage and subtasks.
 
+## OpenServerless Development Tasks
+
+```text
+  ide         OpenServerless Development Utilities
+```
+
 ## OpenServerless Administration Tasks
 
 ```text
@@ -31,11 +37,6 @@ Type `ops <task>` to see usage and subtasks.
   util        Utilities
 ```
 
-## OpenServerless Development Tasks
-
-```text
-  ide         OpenServerless Development Utilities
-```
 
 ## OpenWhisk Tasks
 

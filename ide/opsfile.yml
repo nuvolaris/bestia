@@ -174,7 +174,8 @@ tasks:
         if test -n "$OPS_PASSWORD"
         then export "OPS_PASSWORD"
         fi
-        if $OPS -login "$OPS_APIHOST" "$OPS_USERNAME"
+        echo "DEBUG: ops -login $OPS_APIHOST $OPS_USERNAME"
+        if ops -login "$OPS_APIHOST" "$OPS_USERNAME"
         then
           OPSDEV_HOST_PROT="$(echo "$OPS_APIHOST" | awk -F '://' '{print $1}')"
           OPSDEV_HOST_URL="$(echo "$OPS_APIHOST" | awk -F '://' '{print $2}')"
@@ -183,6 +184,18 @@ tasks:
           config OPSDEV_HOST="$OPSDEV_HOST_PROT://$OPSDEV_USERNAME.$OPSDEV_HOST_URL"
           source ~/.wskprops
         fi
+
+  logout:
+    desc: Logout
+    silent: true
+    cmds:
+    - |
+      if test -e ~/.wskprops
+      then rm ~/.wskprops
+           echo Logged out
+      else
+           echo Not currently logged in
+      fi
 
   poll:
     silent: true
