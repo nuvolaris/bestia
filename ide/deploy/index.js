@@ -42,7 +42,7 @@ function checkPort() {
     const server = createServer();
     server.listen(8080, '0.0.0.0');
     server.on('error', () => {
-        console.log('deployment mode already active (or something listening in 127.0.0.1:8080)');
+        console.log('deployment mode already active (or something listening in :8080)');
         server.close();
     });
     server.on('listening', () => server.close());
