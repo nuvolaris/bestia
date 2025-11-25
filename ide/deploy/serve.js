@@ -29,7 +29,7 @@ import { file } from "bun";
  * @returns {Promise<number>}
  */
 async function findAvailablePort(host, startPort = 8080) {
-    host = host || '127.0.0.1';
+    host = host || '0.0.0.0';
     for (let port = startPort; port < 65535; port++) {
         try {
             const server = Bun.listen({
@@ -124,7 +124,7 @@ async function main() {
     const args = Bun.argv.slice(2);
     const flags = {
         port: 8080,
-        host: "127.0.0.1",
+        host: "0.0.0.0",
         dir: "./",
         proxyHost: null,
         cacheTime: null,
