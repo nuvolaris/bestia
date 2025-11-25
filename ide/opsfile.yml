@@ -149,51 +149,40 @@ tasks:
         if test -e "$OPS_PWD/.env"
         then source "$OPS_PWD/.env"
         fi
-        if test -n "{{._apihost_}}"
-        then OPSDEV_APIHOST="{{._apihost_}}"
-        fi
         echo "*** Configuring Access to OpenServerless ***"
         if test -z "{{._apihost_}}"
         then
             if test -z "$OPS_APIHOST"
             then
                 echo -n "Enter Apihost: "
-                read OPSDEV_APIHOST
-                OPSDEV_APIHOST="$(echo $OPSDEV_APIHOST | tr -d '\r')"
-            else
-                OPSDEV_APIHOST="$OPS_APIHOST"
+                read OPS_APIHOST
+                export OPS_APIHOST="$(echo $OPS_APIHOST | tr -d '\r')"
             fi
-        else OPSDEV_APIHOST="{{._apihost_}}"
+        else export OPS_APIHOST="{{._apihost_}}"
         fi
         if test -z "{{._username_}}"
         then
-            if test -n "$OPS_USERNAME"
+            if test -z "$OPS_USERNAME"
             then
-                OPSDEV_USERNAME="$OPS_USERNAME"
-            else
               echo -n "Enter Username: "
-              read OPSDEV_USERNAME
-              OPSDEV_USERNAME="$(echo $OPSDEV_USERNAME | tr -d '\r')"
+              read OPS_USERNAME
+              export OPS_USERNAME="$(echo $OPS_USERNAME | tr -d '\r')"
             fi
-        else OPSDEV_USERNAME="{{._username_}}"
+        else export OPS_USERNAME="{{._username_}}"
         fi
-        echo "Logging user $OPSDEV_USERNAME in $OPSDEV_APIHOST"
+        echo "Logging user $OPS_USERNAME in $OPS_APIHOST"
         if test -n "$OPS_PASSWORD"
         then export "OPS_PASSWORD"
         fi
-        if $OPS -login "$OPSDEV_APIHOST" "$OPSDEV_USERNAME"
+        if $OPS -login "$OPS_APIHOST" "$OPS_USERNAME"
         then
-          OPSDEV_HOST_PROT="$(echo "$OPSDEV_APIHOST" | awk -F '://' '{print $1}')"
-          OPSDEV_HOST_URL="$(echo "$OPSDEV_APIHOST" | awk -F '://' '{print $2}')"
-          config OPSDEV_APIHOST="$OPSDEV_APIHOST"
-          config OPSDEV_USERNAME="$OPSDEV_USERNAME"
+          OPSDEV_HOST_PROT="$(echo "$OPS_APIHOST" | awk -F '://' '{print $1}')"
+          OPSDEV_HOST_URL="$(echo "$OPS_APIHOST" | awk -F '://' '{print $2}')"
+          config OPSDEV_APIHOST="$OPS_APIHOST"
+          config OPSDEV_USERNAME="$OPS_USERNAME"
           config OPSDEV_HOST="$OPSDEV_HOST_PROT://$OPSDEV_USERNAME.$OPSDEV_HOST_URL"
           source ~/.wskprops
-        else
-          false
         fi
-
-
 
   poll:
     silent: true
