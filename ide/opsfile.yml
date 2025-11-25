@@ -211,7 +211,7 @@ tasks:
       - |
         OPS_UPLOAD_FOLDER=`bun {{.TASKFILE_DIR}}/deploy/info.js upload web`
         echo "Serving assets from ${OPS_UPLOAD_FOLDER:-web}"
-        bun {{.TASKFILE_DIR}}/deploy/serve.js -h 127.0.0.1 -P $OPSDEV_HOST -d "$OPS_PWD/${OPS_UPLOAD_FOLDER:-web}"
+        bun {{.TASKFILE_DIR}}/deploy/serve.js -P $OPSDEV_HOST -d "$OPS_PWD/${OPS_UPLOAD_FOLDER:-web}"
 
   deploy:
     silent: true
