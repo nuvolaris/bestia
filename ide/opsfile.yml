@@ -162,25 +162,25 @@ tasks:
         fi
         if test -z "{{._username_}}"
         then
-            if test -z "$OPS_USERNAME"
+            if test -z "$OPS_USER"
             then
               echo -n "Enter Username: "
-              read OPS_USERNAME
-              export OPS_USERNAME="$(echo $OPS_USERNAME | tr -d '\r')"
+              read OPS_USER
+              export OPS_USER="$(echo $OPS_USERNAME | tr -d '\r')"
             fi
-        else export OPS_USERNAME="{{._username_}}"
+        else export OPS_USER="{{._username_}}"
         fi
-        echo "Logging user $OPS_USERNAME in $OPS_APIHOST"
+        echo "Logging user $OPS_USER in $OPS_APIHOST"
         if test -n "$OPS_PASSWORD"
         then export "OPS_PASSWORD"
         fi
-        echo "DEBUG: ops -login $OPS_APIHOST $OPS_USERNAME"
-        if ops -login "$OPS_APIHOST" "$OPS_USERNAME"
+        echo "DEBUG: ops -login $OPS_APIHOST $OPS_USER"
+        if ops -login
         then
           OPSDEV_HOST_PROT="$(echo "$OPS_APIHOST" | awk -F '://' '{print $1}')"
           OPSDEV_HOST_URL="$(echo "$OPS_APIHOST" | awk -F '://' '{print $2}')"
           config OPSDEV_APIHOST="$OPS_APIHOST"
-          config OPSDEV_USERNAME="$OPS_USERNAME"
+          config OPSDEV_USERNAME="$OPS_USER"
           config OPSDEV_HOST="$OPSDEV_HOST_PROT://$OPSDEV_USERNAME.$OPSDEV_HOST_URL"
           source ~/.wskprops
         fi
