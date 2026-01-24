@@ -48,7 +48,7 @@ tasks:
             You can then use 'ops ide devel' and 'ops ide deploy'.
             You can also reopen the project with VSCode and use the command 'Reopen in Container'.
     cmds:
-      - test -e "/.dockerenv" || die "{{.MSG}}"
+      #- test -e "/.dockerenv" || die "{{.MSG}}"
       - test "$(python3 -V | awk -F. '{print $2}')" -ge 10 || die "python 3.10 or greater not available"
       - test -x "$(which virtualenv)" || die "you need python virtualenv"
       - test "$(node -v | awk -F. '{print substr($1,2) }')" -ge 18 || die "nodejs 18 or greater not available"
