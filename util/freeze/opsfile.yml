@@ -4,7 +4,7 @@ vars:
   CLUSTER: nuvolaris
   KIND_CLUSTER: '{{.CLUSTER}}-control-plane'
   BASE:
-    sh: echo ~/.ops
+    sh: echo ~/.ops | replace -s \\ -r / --stdin
   IMAGES:
      sh: >
         echo {{.BASE}}/{{OS}}-{{ARCH}}/images
@@ -44,20 +44,20 @@ tasks:
         file={{.IMAGES}}/docker/$(base64 -e "$img")
         if test -e "$file"
         then echo "already saved $img.{{ARCH}} "
-        else echo ">>> Saving: $img"
-             if docker pull --platform linux/{{ARCH}} "$img"
-             then echo "OK: save $file"
-             else echo "*** FAIL: pull $img"
-             fi
-             if docker save "$img" -o "$file"
-             then echo "OK: save $file"
-             else echo "*** FAIL: save $file"
-             fi
+        else  echo ">>> Saving: $img"
+              if docker pull --platform linux/{{ARCH}} "$img"
+              then echo "OK: save $file"
+              else echo "*** FAIL: pull $img"
+              fi
+              if docker save "$img" -o "$file"
+              then echo "OK: save $file"
+              else echo "*** FAIL: save $file"
+              fi
         fi
       done
 
   kind-save:
-    silent: false
+    silent: true
     desc: list images in kindes
     env:
       CLU: "{{.KIND_CLUSTER}}"
@@ -67,6 +67,20 @@ tasks:
       docker exec -it "$CLU" crictl images 2>/dev/null
       | awk 'NR > 1  && !/^(registry.k8s.io\/(kube-|coredns|etc|pause|ingress-nginx)|docker.io\/kindest\/)/ {print  $1 ":" $2 }'
       >> _kind.lst
+    - task: _kind-get-images
+
+  kind-preload:
+    desc: preload docker images from config
+    silent: true
+    env:
+      IMAGE_DIR: "{{.IMAGES}}/kind"
+    cmds:
+    - bun findimages.js >_kind.lst
+    - task: _kind-get-images
+
+  _kind-get-images:
+    silent: true
+    cmds:
     - mkdir -p {{.IMAGES}}/kind
     - |
       cat _kind.lst | while read img
@@ -74,7 +88,7 @@ tasks:
         file={{.IMAGES}}/kind/"$(base64 -e "$img")"
         if test -e "$file"
         then echo "already saved $img"
-        else echo ">>> Saving: $img"
+        else echo ">>> Saving: {{ARCH}} $img"
             if !  docker pull --platform linux/{{ARCH}} "$img"
             then echo "*** FAIL pull $img" ; continue
             fi
@@ -84,6 +98,14 @@ tasks:
             echo "OK: save $file"
         fi
       done
+
+  kind-preload-one:
+    silent: true
+    desc: preload one specified image
+    cmds:
+    - test -n "{{.CLI_ARGS}}" || die "specify the image to preload"
+    - echo "{{.CLI_ARGS}}" >_kind.lst
+    - task: _kind-get-images
 
   image-save:
     desc: save images
@@ -139,17 +161,15 @@ tasks:
     desc: load disk images in kind
     cmds:
       - |
-        N=0
         for file in {{.IMAGES}}/kind/*
         do
-           N=$(($N+1))
-           printf "\rKind: loading images: [$(seq 1 $N | awk '{printf "#"}')]"
-           #echo $file
            b64="$(basename "$file")"
            img="$(base64 -d "${b64#*-}")"
-           docker load -i "$file" --platform "linux/{{ARCH}}"
-           kind load docker-image "$img" -n {{.CLUSTER}} --nodes {{.CLUSTER}}-control-plane
+           echo "Kind: loading $img"
+           docker exec -i {{.CLUSTER}}-control-plane ctr --namespace=k8s.io images import --snapshotter=overlayfs - < "$file"
         done
+        echo 'Images loaded:'
+      - task: kind-list
     status:
       - test -z "$(ls {{.IMAGES}}/kind/* 2>/dev/null)"
 

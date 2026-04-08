@@ -32,12 +32,6 @@ env:
 
 tasks:
 
-  waitinfo:
-    silent: true
-    desc: get info on the cluster retrying until it is available
-    cmds:
-    - retry -t 100 -m 10 kubectl cluster-info
-
   waitfor:
     desc: wait for an object matching a condition
     silent: true
